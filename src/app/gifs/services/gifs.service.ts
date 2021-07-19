@@ -16,7 +16,17 @@ export class GifsService {
     return [ ...this._historial]; // TODO:  retornará un nuevo arreglo con el valor del historial, cuando se usa el spread  de esta forma para heredar valores, genera un nuevo array
   }
 
-  constructor( private http: HttpClient) {} // INYECTO EL SERVICIO HTTP
+  constructor( private http: HttpClient) { // se ejecuta una vez
+
+    if(localStorage.getItem('Historial')){
+      this._historial = JSON.parse( localStorage.getItem('Historial')! );
+    }
+
+    if(localStorage.getItem('Resultados')){
+      this.resultados = JSON.parse(localStorage.getItem('Resultados')!);
+    }
+
+  } // INYECTO EL SERVICIO HTTP
 
   buscarGifs (  query:string ) {
     query = query
@@ -29,6 +39,7 @@ export class GifsService {
       this._historial = this._historial.splice(0, 10); // TODO: el array se limita a 10 valores
     
       localStorage.setItem('Historial', JSON.stringify(this._historial));
+      localStorage.setItem('Resultados', JSON.stringify(this.resultados));
     }
 
     // TODO: PETICIÓN HTTP -> LLAMADO A LA API -> con el objeto de angular
