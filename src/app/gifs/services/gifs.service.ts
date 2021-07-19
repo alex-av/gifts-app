@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Gif, SearchGifResponse } from 'src/app/interfaces/gif.interface';
 
@@ -8,6 +8,7 @@ import { Gif, SearchGifResponse } from 'src/app/interfaces/gif.interface';
 export class GifsService {
 
   private APIKey: string = 'Qor0DrV7rjBjXchU76gevQxfDJsEIRyL'; // TODO: api key obtenida de giphy developers 
+  private serviceURL = 'https://api.giphy.com/v1/gifs';
   private _historial: string[] = []; // TODO:  creo una propiedad privada de array tipo string
   public resultados: Gif[] = [];
 
@@ -18,13 +19,12 @@ export class GifsService {
 
   constructor( private http: HttpClient) { // se ejecuta una vez
 
+    // TODO: Llamar el almacenamiento versión 1
     if(localStorage.getItem('Historial')){
       this._historial = JSON.parse( localStorage.getItem('Historial')! );
     }
-
-    if(localStorage.getItem('Resultados')){
-      this.resultados = JSON.parse(localStorage.getItem('Resultados')!);
-    }
+    // TODO: Llamar el almacenamiento versión 2
+    this.resultados = JSON.parse(localStorage.getItem('Resultados')!) || [];
 
   } // INYECTO EL SERVICIO HTTP
 
@@ -39,14 +39,20 @@ export class GifsService {
       this._historial = this._historial.splice(0, 10); // TODO: el array se limita a 10 valores
     
       localStorage.setItem('Historial', JSON.stringify(this._historial));
-      localStorage.setItem('Resultados', JSON.stringify(this.resultados));
     }
 
+    // TODO: Params 
+    const params = new HttpParams()
+      .set('api_key', this.APIKey)
+      .set('limit', '10')
+      .set('q', query)
+
     // TODO: PETICIÓN HTTP -> LLAMADO A LA API -> con el objeto de angular
-    this.http.get<SearchGifResponse>(`https://api.giphy.com/v1/gifs/search?api_key=${ this.APIKey }&q=${ query }&limit=10`)
+    this.http.get<SearchGifResponse>(`${this.serviceURL}/search`, { params: params })
       .subscribe( (resp) => { 
         console.log(resp.data);
         this.resultados = resp.data;
+        localStorage.setItem('Resultados', JSON.stringify(this.resultados));
       } );
     
 

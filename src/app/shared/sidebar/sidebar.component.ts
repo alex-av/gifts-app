@@ -11,6 +11,10 @@ export class SidebarComponent{
   get historial () { // TODO: creo un getter llamado historial teniendo en cuenta que desde el servicio está seteado como propiedad privada
     return this.service.historial
   }
+
+  buscar ( term: string ) {
+    this.service.buscarGifs(term);
+  }
   constructor( private service:GifsService) { }
 
 
